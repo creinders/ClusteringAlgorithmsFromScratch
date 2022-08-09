@@ -1,0 +1,6 @@
+hydra-core
+matplotlib
+seaborn
+numpy
+scikit-learn
+imageio

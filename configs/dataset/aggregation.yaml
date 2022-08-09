@@ -1,0 +1,4 @@
+# @package _global_
+dataset: aggregation
+default_bandwidth: 0.07
+default_n_clusters: 7

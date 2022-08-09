@@ -1,0 +1,13 @@
+defaults:
+  - dataset: aggregation
+  - algorithm: meanshift
+  - _self_
+
+framework: 'jax'  # numpy, pytorch, jax, tensorflow, tensorflow_eager
+cuda: true
+seed: 0
+verbose: true
+time: false
+time_repeats: 10
+plot: true
+plot_gif: false

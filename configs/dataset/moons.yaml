@@ -1,0 +1,4 @@
+# @package _global_
+dataset: 'moons'
+default_bandwidth: 0.2
+default_n_clusters: 2

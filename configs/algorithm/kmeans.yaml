@@ -1,0 +1,5 @@
+# @package _global_
+algorithm_name: 'kmeans'
+n_clusters: null
+max_iter: 100
+early_stop_threshold: 0.00001

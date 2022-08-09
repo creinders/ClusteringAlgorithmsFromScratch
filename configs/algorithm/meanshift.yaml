@@ -1,0 +1,5 @@
+# @package _global_
+algorithm_name: 'meanshift'
+bandwidth: null
+early_stop_threshold: 0.00001
+cluster_threshold: 0.0005

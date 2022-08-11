@@ -9,11 +9,12 @@ def normalize(d, epsilon=1e-15):
     max = np.max(d, axis=0)
     return (d - min) / np.maximum(max - min, epsilon)
 
-def load_text_data(path, shuffle=True):
+def load_text_data(path, shuffle=True, random_state=None):
     total = np.loadtxt(path)
 
     if shuffle:
-        np.random.shuffle(total)
+        rdn = np.random.RandomState(random_state)
+        rdn.shuffle(total)
 
     # Last column should be label, subtract minimum to always have 0 indexing
     total[:, -1] = total[:, -1] - np.min(total[:, -1])
@@ -22,10 +23,10 @@ def load_text_data(path, shuffle=True):
     return x, y
 
 
-def load_moons(n_total=2000):
+def load_moons(n_total=2000, random_state=None):
     from sklearn.datasets import make_moons
 
-    return make_moons(n_samples=n_total, noise=.05)
+    return make_moons(n_samples=n_total, noise=.05, random_state=random_state)
 
 
 def load_pa(path):
@@ -44,7 +45,7 @@ def load_pa(path):
     return np.array(result) - np.min(result)
 
 
-def load_s4(n_total=1000):
+def load_s4(n_total=1000, random_state=None):
     import os
 
     data_folder = os.path.join(os.path.dirname(__file__), '..', 'data')
@@ -53,7 +54,8 @@ def load_s4(n_total=1000):
     assert len(x) == len(y)
 
     if n_total is not None:
-        idxs = np.random.choice(np.arange(len(x)), n_total)
+        rdn = np.random.RandomState(random_state)
+        idxs = rdn.choice(np.arange(len(x)), n_total)
         x, y = x[idxs], y[idxs]
 
     return x, y

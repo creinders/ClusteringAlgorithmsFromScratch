@@ -55,8 +55,8 @@ def scatter_mean0(src, index, axis_size=None, return_counts=False):
     numerator = torch.zeros(axis_size, dtype=torch.int64, device=src.device)
 
     torch.index_put_(accumulator, (index,), src, accumulate=True)
-    one = torch.ones(tuple(), dtype=torch.int64, device=numerator.device)
-    torch.index_put_(numerator, (index,), one, accumulate=True)
+    ones = torch.ones(len(index), dtype=torch.int64, device=numerator.device)
+    torch.index_put_(numerator, (index,), ones, accumulate=True)
 
     result = accumulator / numerator.reshape(axis_size, *((1,) * len(src.shape[1:])))
 

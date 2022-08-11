@@ -1,4 +1,3 @@
-import numpy as np
 import torch
 
 from algorithms.meanshift_base import MeanShiftBase
@@ -12,7 +11,6 @@ class MeanShiftPytorch(MeanShiftBase):
         self.cuda = cuda
 
         self.pi = torch.asin(torch.tensor(1.))
-
         if cuda:
             self.pi = self.pi.cuda()
 
@@ -44,7 +42,7 @@ class MeanShiftPytorch(MeanShiftBase):
 
             new_centers = w[:, :, None] * X[None, :, :]
             w_sum = w.sum(1)
-            new_centers = torch.sum(new_centers, axis=1) / w_sum[:, None]
+            new_centers = torch.sum(new_centers, dim=1) / w_sum[:, None]
 
             diff = torch.sum(torch.square(new_centers - clusters))
 
@@ -59,24 +57,10 @@ class MeanShiftPytorch(MeanShiftBase):
         return clusters, assignments
 
     def _group_clusters(self, points):
-        cluster_ids = []
-        cluster_centers = []
+        from algorithms.util_pt import connected_components_undirected, scatter_mean0
 
-        for point in points:
-            add = True
-            for cluster_index, cluster in enumerate(cluster_centers):
-                dist = torch.sum(torch.square(point  - cluster), axis=-1)
-                if dist < self.cluster_threshold:
-                    cluster_ids.append(cluster_index)
-                    add = False
-                    break
-
-            if add:
-                cluster_ids.append(len(cluster_centers))
-                cluster_centers.append(point)
-
-        cluster_centers = torch.stack(cluster_centers, dim=0)
-        cluster_ids = torch.tensor(cluster_ids, device=cluster_centers.device)
+        _, cluster_ids = connected_components_undirected(self.distance(points, points) < self.cluster_threshold)
+        cluster_centers = scatter_mean0(points, cluster_ids)
         return cluster_centers, cluster_ids
     
     def tensor_to_numpy(self, t):

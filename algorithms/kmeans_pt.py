@@ -1,7 +1,7 @@
-from math import dist
-import numpy as np
-from .kmeans_base import KMeansBase
+from algorithms.kmeans_base import KMeansBase
+from algorithms.util_pt import scatter_mean0
 import torch
+
 
 class KMeansPytorch(KMeansBase):
 
@@ -22,15 +22,15 @@ class KMeansPytorch(KMeansBase):
         return X, centers
 
     def _main_loop(self, X, centers):
-
         for _ in range(self.max_iter):
 
             distance = (X[:, :, None] - centers.permute((1, 0))[None, ...]).square().sum(1)
             assignments = torch.argmin(distance, dim=1)
 
-            new_centers = centers
-            for i in range(self.n_clusters):
-                new_centers[i] = X[assignments == i].mean(0)
+            # k-Means can assign no points to a cluster center, in that case keep old value
+            center_means, assigned_counts = scatter_mean0(X, assignments, axis_size=self.n_clusters, return_counts=True)
+            new_centers = torch.clone(centers)
+            new_centers[assigned_counts > 0] = center_means[assigned_counts > 0]
 
             diff = (new_centers - centers).square().sum()
             if diff < self.early_stop_threshold:

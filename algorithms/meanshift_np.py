@@ -50,21 +50,9 @@ class MeanShiftNumpy(MeanShiftBase):
         return clusters, assignments
 
     def _group_clusters(self, points):
-        cluster_ids = []
-        cluster_centers = []
+        from algorithms.util_np import connected_components_undirected, scatter_mean0
 
-        for point in points:
-            add = True
-            for cluster_index, cluster in enumerate(cluster_centers):
-                dist = np.sum(np.square(point  - cluster), axis=-1)
-                if dist < self.cluster_threshold:
-                    cluster_ids.append(cluster_index)
-                    add = False
-                    break
-
-            if add:
-                cluster_ids.append(len(cluster_centers))
-                cluster_centers.append(point)
-        cluster_centers = np.stack(cluster_centers, axis=0)
+        _, cluster_ids = connected_components_undirected(self.distance(points, points) < self.cluster_threshold)
+        cluster_centers = scatter_mean0(points, cluster_ids)
         return cluster_centers, cluster_ids
 

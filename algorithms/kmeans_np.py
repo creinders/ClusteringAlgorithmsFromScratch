@@ -1,27 +1,11 @@
 import numpy as np
-from .kmeans_base import KMeansBase
+from algorithms.kmeans_base import KMeansBase
+from algorithms.util_np import scatter_mean0
 
 
 class KMeansNumpy(KMeansBase):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-
-    @staticmethod
-    def _scatter_mean0(src, index, axis_size=None):
-        """
-        Scatter mean on 0-th axis
-        """
-
-        if axis_size is None:
-            axis_size = np.max(index) + 1
-
-        # Target shape is target size and remaining value shape without indexed dimension
-        accumulator = np.zeros((axis_size,) + src.shape[1:], dtype=src.dtype)
-        numerator = np.zeros(axis_size, dtype=int)
-
-        np.add.at(accumulator, index, src)
-        np.add.at(numerator, index, 1)
-        return accumulator / numerator.reshape(axis_size, *((1,) * len(src.shape[1:])))
 
     def _main_loop(self, X, centers):
 
@@ -29,7 +13,11 @@ class KMeansNumpy(KMeansBase):
             distance = np.sum(np.square((X[:, :, None] - np.transpose(centers)[None, ...])), axis=1)
             assignments = np.argmin(distance, axis=1)
 
-            new_centers = KMeansNumpy._scatter_mean0(X, assignments, axis_size=self.n_clusters)
+            # k-Means can assign no points to a cluster center, in that case keep old value
+            center_means, assigned_counts = scatter_mean0(X, assignments, axis_size=self.n_clusters, return_counts=True)
+            new_centers = np.copy(centers)
+            new_centers[assigned_counts > 0] = center_means[assigned_counts > 0]
+
             diff = np.sum(np.square(new_centers - centers))
 
             if self.verbose:

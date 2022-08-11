@@ -10,9 +10,9 @@ Clustering algorithms
 
 Machine learning frameworks
 - [NumPy](https://numpy.org)
-- [PyTorch](http://pytorch.org)
+- [PyTorch](https://pytorch.org)
 - [TensorFlow (Eager and Graph Mode)](https://www.tensorflow.org)
-- [JAX](http://jax.readthedocs.io/)
+- [JAX](https://jax.readthedocs.io/)
 
 
 ## Algorithms

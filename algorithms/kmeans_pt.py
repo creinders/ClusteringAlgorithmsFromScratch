@@ -22,7 +22,7 @@ class KMeansPytorch(KMeansBase):
         return X, centers
 
     def _main_loop(self, X, centers):
-        for _ in range(self.max_iter):
+        for iteration in range(self.max_iter):
 
             distance = (X[:, :, None] - centers.permute((1, 0))[None, ...]).square().sum(1)
             assignments = torch.argmin(distance, dim=1)
@@ -33,6 +33,9 @@ class KMeansPytorch(KMeansBase):
             new_centers[assigned_counts > 0] = center_means[assigned_counts > 0]
 
             diff = (new_centers - centers).square().sum()
+            if self.verbose:
+                print('Iteration {}: {} difference'.format(iteration, diff))
+
             if diff < self.early_stop_threshold:
                 break
 

@@ -11,7 +11,7 @@ def build_algorithm(cfg, callback=None, verbose=False):
             clustering_class = KMeansNumpy
         elif framework_name == 'pytorch':
             from algorithms.kmeans_pt import KMeansPytorch
-            clustering_class = KMeansPytorch
+            clustering_class = partial(KMeansPytorch, cuda=cfg.cuda)
         elif framework_name == 'jax':
             from algorithms.kmeans_jax import KMeansJax
             clustering_class = KMeansJax

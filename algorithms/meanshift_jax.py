@@ -6,7 +6,7 @@ from jax import jit
 from functools import partial
 
 from algorithms.meanshift_base import MeanShiftBase
-
+from algorithms.util_jax import connected_components_undirected, scatter_mean0
 
 class MeanShiftJax(MeanShiftBase):
 
@@ -59,28 +59,12 @@ class MeanShiftJax(MeanShiftBase):
             (clusters, 1000)
         )
 
-        clusters, assignments = self._group_clusters(clusters, self.cluster_threshold)
+        clusters, assignments = self._group_clusters(clusters)
         return clusters, assignments
 
-    def _group_clusters(self, points, t):
-        cluster_ids = []
-        cluster_centers = []
-
-        for point in points:
-            add = True
-            for cluster_index, cluster in enumerate(cluster_centers):
-                dist = jnp.sum(jnp.square(point  - cluster), axis=-1)
-                if dist < t:
-                    cluster_ids.append(cluster_index)
-                    add = False
-                    break
-
-            if add:
-                cluster_ids.append(len(cluster_centers))
-                cluster_centers.append(point)
-
-        cluster_centers = jnp.stack(cluster_centers, axis=0)
-        cluster_ids = jnp.array(cluster_ids)
+    def _group_clusters(self, points):
+        _, cluster_ids = connected_components_undirected(self.distance(points, points) < self.cluster_threshold)
+        cluster_centers = scatter_mean0(points, cluster_ids)
         return cluster_centers, cluster_ids
     
     def tensor_to_numpy(self, t):
